@@ -1,5 +1,1048 @@
 import { useState, useEffect, useCallback } from "react";
 
+// ─── Animated Exercise Visualizations ───
+// Each returns an SVG with CSS keyframe animation showing proper form
+
+const ExVis = ({ name, playing }) => {
+  const key = name.toLowerCase().replace(/[^a-z ]/g, "");
+  const Comp = VIS_MAP[Object.keys(VIS_MAP).find(k => key.includes(k))] || GenericVis;
+  return <Comp playing={playing} />;
+};
+
+function GenericVis({ playing }) {
+  return (
+    <svg viewBox="0 0 120 120" style={{ width: "100%", height: "100%" }}>
+      <style>{`
+        @keyframes genBob { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-3px)} }
+        .gen-body { animation: ${playing ? "genBob 1.5s ease-in-out infinite" : "none"}; }
+      `}</style>
+      <g className="gen-body">
+        <circle cx="60" cy="28" r="10" fill="none" stroke="#334155" strokeWidth="2.5" />
+        <line x1="60" y1="38" x2="60" y2="70" stroke="#334155" strokeWidth="2.5" strokeLinecap="round" />
+        <line x1="60" y1="48" x2="40" y2="62" stroke="#334155" strokeWidth="2.5" strokeLinecap="round" />
+        <line x1="60" y1="48" x2="80" y2="62" stroke="#334155" strokeWidth="2.5" strokeLinecap="round" />
+        <line x1="60" y1="70" x2="45" y2="95" stroke="#334155" strokeWidth="2.5" strokeLinecap="round" />
+        <line x1="60" y1="70" x2="75" y2="95" stroke="#334155" strokeWidth="2.5" strokeLinecap="round" />
+      </g>
+      <text x="60" y="114" textAnchor="middle" fontSize="8" fill="#94a3b8">Exercise</text>
+    </svg>
+  );
+}
+
+function PushupVis({ playing }) {
+  return (
+    <svg viewBox="0 0 160 100" style={{ width: "100%", height: "100%" }}>
+      <style>{`
+        @keyframes pushup { 
+          0%,100%{ transform: rotate(0deg); } 
+          50%{ transform: rotate(-8deg); } 
+        }
+        @keyframes pushupArm { 
+          0%,100%{ transform: rotate(0deg); } 
+          50%{ transform: rotate(15deg); } 
+        }
+        .pu-body { transform-origin: 130px 75px; animation: ${playing ? "pushup 1.8s ease-in-out infinite" : "none"}; }
+        .pu-arm { transform-origin: 55px 55px; animation: ${playing ? "pushupArm 1.8s ease-in-out infinite" : "none"}; }
+      `}</style>
+      <line x1="20" y1="80" x2="140" y2="80" stroke="#e2e8f0" strokeWidth="2" />
+      <g className="pu-body">
+        <circle cx="40" cy="48" r="8" fill="none" stroke="#334155" strokeWidth="2.5" />
+        <line x1="48" y1="50" x2="115" y2="60" stroke="#334155" strokeWidth="2.5" strokeLinecap="round" />
+        <line x1="115" y1="60" x2="130" y2="75" stroke="#334155" strokeWidth="2.5" strokeLinecap="round" />
+      </g>
+      <g className="pu-arm">
+        <line x1="55" y1="55" x2="55" y2="78" stroke="#334155" strokeWidth="2.5" strokeLinecap="round" />
+        <line x1="75" y1="58" x2="75" y2="78" stroke="#334155" strokeWidth="2.5" strokeLinecap="round" />
+      </g>
+      <circle cx="55" cy="80" r="2" fill="#334155" />
+      <circle cx="75" cy="80" r="2" fill="#334155" />
+    </svg>
+  );
+}
+
+function SquatVis({ playing }) {
+  return (
+    <svg viewBox="0 0 120 120" style={{ width: "100%", height: "100%" }}>
+      <style>{`
+        @keyframes squat {
+          0%,100%{ transform: translateY(0); }
+          50%{ transform: translateY(18px); }
+        }
+        @keyframes sqKnee {
+          0%,100%{ d: path("M60,70 L50,90 L50,105"); }
+          50%{ d: path("M60,70 L45,82 L42,100"); }
+        }
+        .sq-upper { animation: ${playing ? "squat 2s ease-in-out infinite" : "none"}; }
+      `}</style>
+      <line x1="20" y1="108" x2="100" y2="108" stroke="#e2e8f0" strokeWidth="2" />
+      <g className="sq-upper">
+        <circle cx="60" cy="22" r="9" fill="none" stroke="#334155" strokeWidth="2.5" />
+        <line x1="60" y1="31" x2="60" y2="62" stroke="#334155" strokeWidth="2.5" strokeLinecap="round" />
+        <line x1="60" y1="42" x2="44" y2="55" stroke="#334155" strokeWidth="2.5" strokeLinecap="round" />
+        <line x1="60" y1="42" x2="76" y2="55" stroke="#334155" strokeWidth="2.5" strokeLinecap="round" />
+        <line x1="60" y1="62" x2="48" y2="82" stroke="#334155" strokeWidth="2.5" strokeLinecap="round" />
+        <line x1="48" y1="82" x2="46" y2="106" stroke="#334155" strokeWidth="2.5" strokeLinecap="round" />
+        <line x1="60" y1="62" x2="72" y2="82" stroke="#334155" strokeWidth="2.5" strokeLinecap="round" />
+        <line x1="72" y1="82" x2="74" y2="106" stroke="#334155" strokeWidth="2.5" strokeLinecap="round" />
+      </g>
+    </svg>
+  );
+}
+
+function PlankVis({ playing }) {
+  return (
+    <svg viewBox="0 0 160 90" style={{ width: "100%", height: "100%" }}>
+      <style>{`
+        @keyframes plankShake { 
+          0%,100%{transform:translateY(0)} 25%{transform:translateY(-1px)} 75%{transform:translateY(1px)} 
+        }
+        .plk { animation: ${playing ? "plankShake 0.8s ease-in-out infinite" : "none"}; }
+      `}</style>
+      <line x1="15" y1="72" x2="145" y2="72" stroke="#e2e8f0" strokeWidth="2" />
+      <g className="plk">
+        <circle cx="35" cy="42" r="8" fill="none" stroke="#334155" strokeWidth="2.5" />
+        <line x1="43" y1="44" x2="120" y2="50" stroke="#334155" strokeWidth="2.5" strokeLinecap="round" />
+        <line x1="120" y1="50" x2="128" y2="70" stroke="#334155" strokeWidth="2.5" strokeLinecap="round" />
+        <line x1="50" y1="46" x2="48" y2="70" stroke="#334155" strokeWidth="2.5" strokeLinecap="round" />
+        <line x1="60" y1="47" x2="58" y2="70" stroke="#334155" strokeWidth="2.5" strokeLinecap="round" />
+      </g>
+      <text x="80" y="85" textAnchor="middle" fontSize="7" fill="#16a34a" fontWeight="600">{playing ? "Hold steady!" : "Plank"}</text>
+    </svg>
+  );
+}
+
+function LungeVis({ playing }) {
+  return (
+    <svg viewBox="0 0 120 120" style={{ width: "100%", height: "100%" }}>
+      <style>{`
+        @keyframes lungeDown { 0%,100%{transform:translateY(0)} 50%{transform:translateY(12px)} }
+        .lu { animation: ${playing ? "lungeDown 2s ease-in-out infinite" : "none"}; }
+      `}</style>
+      <line x1="15" y1="108" x2="105" y2="108" stroke="#e2e8f0" strokeWidth="2" />
+      <g className="lu">
+        <circle cx="55" cy="18" r="8" fill="none" stroke="#334155" strokeWidth="2.5" />
+        <line x1="55" y1="26" x2="55" y2="58" stroke="#334155" strokeWidth="2.5" strokeLinecap="round" />
+        <line x1="55" y1="36" x2="40" y2="50" stroke="#334155" strokeWidth="2.5" strokeLinecap="round" />
+        <line x1="55" y1="36" x2="70" y2="50" stroke="#334155" strokeWidth="2.5" strokeLinecap="round" />
+        <line x1="55" y1="58" x2="38" y2="78" stroke="#334155" strokeWidth="2.5" strokeLinecap="round" />
+        <line x1="38" y1="78" x2="35" y2="106" stroke="#334155" strokeWidth="2.5" strokeLinecap="round" />
+        <line x1="55" y1="58" x2="75" y2="78" stroke="#334155" strokeWidth="2.5" strokeLinecap="round" />
+        <line x1="75" y1="78" x2="82" y2="106" stroke="#334155" strokeWidth="2.5" strokeLinecap="round" />
+      </g>
+    </svg>
+  );
+}
+
+function RowVis({ playing }) {
+  return (
+    <svg viewBox="0 0 140 110" style={{ width: "100%", height: "100%" }}>
+      <style>{`
+        @keyframes rowPull { 0%,100%{transform:rotate(0deg)} 50%{transform:rotate(-20deg)} }
+        .row-arm { transform-origin: 70px 48px; animation: ${playing ? "rowPull 1.6s ease-in-out infinite" : "none"}; }
+      `}</style>
+      <rect x="20" y="58" width="30" height="20" rx="3" fill="none" stroke="#94a3b8" strokeWidth="1.5" />
+      <line x1="15" y1="80" x2="125" y2="80" stroke="#e2e8f0" strokeWidth="2" />
+      <circle cx="80" cy="30" r="8" fill="none" stroke="#334155" strokeWidth="2.5" />
+      <line x1="80" y1="38" x2="70" y2="62" stroke="#334155" strokeWidth="2.5" strokeLinecap="round" />
+      <line x1="70" y1="62" x2="60" y2="78" stroke="#334155" strokeWidth="2.5" strokeLinecap="round" />
+      <line x1="70" y1="62" x2="85" y2="78" stroke="#334155" strokeWidth="2.5" strokeLinecap="round" />
+      <g className="row-arm">
+        <line x1="75" y1="48" x2="55" y2="58" stroke="#334155" strokeWidth="2.5" strokeLinecap="round" />
+        <rect x="48" y="55" width="8" height="4" rx="2" fill="#64748b" />
+      </g>
+    </svg>
+  );
+}
+
+function CurlVis({ playing }) {
+  return (
+    <svg viewBox="0 0 120 120" style={{ width: "100%", height: "100%" }}>
+      <style>{`
+        @keyframes curl { 0%,100%{transform:rotate(0deg)} 50%{transform:rotate(-110deg)} }
+        .curl-fore { transform-origin: 72px 60px; animation: ${playing ? "curl 1.8s ease-in-out infinite" : "none"}; }
+      `}</style>
+      <line x1="20" y1="108" x2="100" y2="108" stroke="#e2e8f0" strokeWidth="2" />
+      <circle cx="60" cy="22" r="9" fill="none" stroke="#334155" strokeWidth="2.5" />
+      <line x1="60" y1="31" x2="60" y2="65" stroke="#334155" strokeWidth="2.5" strokeLinecap="round" />
+      <line x1="60" y1="45" x2="45" y2="60" stroke="#334155" strokeWidth="2.5" strokeLinecap="round" />
+      <line x1="60" y1="45" x2="72" y2="60" stroke="#334155" strokeWidth="2.5" strokeLinecap="round" />
+      <g className="curl-fore">
+        <line x1="72" y1="60" x2="72" y2="82" stroke="#334155" strokeWidth="2.5" strokeLinecap="round" />
+        <rect x="68" y="80" width="8" height="5" rx="2" fill="#64748b" />
+      </g>
+      <line x1="60" y1="65" x2="48" y2="90" stroke="#334155" strokeWidth="2.5" strokeLinecap="round" />
+      <line x1="48" y1="90" x2="46" y2="106" stroke="#334155" strokeWidth="2.5" strokeLinecap="round" />
+      <line x1="60" y1="65" x2="72" y2="90" stroke="#334155" strokeWidth="2.5" strokeLinecap="round" />
+      <line x1="72" y1="90" x2="74" y2="106" stroke="#334155" strokeWidth="2.5" strokeLinecap="round" />
+    </svg>
+  );
+}
+
+function ShoulderPressVis({ playing }) {
+  return (
+    <svg viewBox="0 0 120 120" style={{ width: "100%", height: "100%" }}>
+      <style>{`
+        @keyframes press { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-18px)} }
+        .press-arm { animation: ${playing ? "press 1.8s ease-in-out infinite" : "none"}; }
+      `}</style>
+      <line x1="20" y1="108" x2="100" y2="108" stroke="#e2e8f0" strokeWidth="2" />
+      <circle cx="60" cy="28" r="9" fill="none" stroke="#334155" strokeWidth="2.5" />
+      <line x1="60" y1="37" x2="60" y2="68" stroke="#334155" strokeWidth="2.5" strokeLinecap="round" />
+      <g className="press-arm">
+        <line x1="60" y1="47" x2="40" y2="38" stroke="#334155" strokeWidth="2.5" strokeLinecap="round" />
+        <line x1="40" y1="38" x2="36" y2="22" stroke="#334155" strokeWidth="2.5" strokeLinecap="round" />
+        <rect x="32" y="18" width="8" height="5" rx="2" fill="#64748b" />
+        <line x1="60" y1="47" x2="80" y2="38" stroke="#334155" strokeWidth="2.5" strokeLinecap="round" />
+        <line x1="80" y1="38" x2="84" y2="22" stroke="#334155" strokeWidth="2.5" strokeLinecap="round" />
+        <rect x="80" y="18" width="8" height="5" rx="2" fill="#64748b" />
+      </g>
+      <line x1="60" y1="68" x2="48" y2="92" stroke="#334155" strokeWidth="2.5" strokeLinecap="round" />
+      <line x1="48" y1="92" x2="46" y2="106" stroke="#334155" strokeWidth="2.5" strokeLinecap="round" />
+      <line x1="60" y1="68" x2="72" y2="92" stroke="#334155" strokeWidth="2.5" strokeLinecap="round" />
+      <line x1="72" y1="92" x2="74" y2="106" stroke="#334155" strokeWidth="2.5" strokeLinecap="round" />
+    </svg>
+  );
+}
+
+function FloorPressVis({ playing }) {
+  return (
+    <svg viewBox="0 0 160 90" style={{ width: "100%", height: "100%" }}>
+      <style>{`
+        @keyframes fpress { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-14px)} }
+        .fp-arm { animation: ${playing ? "fpress 1.8s ease-in-out infinite" : "none"}; }
+      `}</style>
+      <line x1="10" y1="72" x2="150" y2="72" stroke="#e2e8f0" strokeWidth="2" />
+      <circle cx="30" cy="58" r="8" fill="none" stroke="#334155" strokeWidth="2.5" />
+      <line x1="38" y1="60" x2="90" y2="68" stroke="#334155" strokeWidth="2.5" strokeLinecap="round" />
+      <line x1="90" y1="68" x2="110" y2="70" stroke="#334155" strokeWidth="2.5" strokeLinecap="round" />
+      <line x1="110" y1="70" x2="125" y2="70" stroke="#334155" strokeWidth="2.5" strokeLinecap="round" />
+      <g className="fp-arm">
+        <line x1="55" y1="64" x2="55" y2="45" stroke="#334155" strokeWidth="2.5" strokeLinecap="round" />
+        <rect x="50" y="40" width="10" height="5" rx="2" fill="#64748b" />
+        <line x1="70" y1="66" x2="70" y2="47" stroke="#334155" strokeWidth="2.5" strokeLinecap="round" />
+        <rect x="65" y="42" width="10" height="5" rx="2" fill="#64748b" />
+      </g>
+    </svg>
+  );
+}
+
+function DeadHangVis({ playing }) {
+  return (
+    <svg viewBox="0 0 120 120" style={{ width: "100%", height: "100%" }}>
+      <style>{`
+        @keyframes hangSway { 0%,100%{transform:rotate(-2deg)} 50%{transform:rotate(2deg)} }
+        .hang-body { transform-origin: 60px 18px; animation: ${playing ? "hangSway 2s ease-in-out infinite" : "none"}; }
+      `}</style>
+      <rect x="30" y="10" width="60" height="6" rx="3" fill="#94a3b8" />
+      <g className="hang-body">
+        <line x1="45" y1="16" x2="45" y2="30" stroke="#334155" strokeWidth="2.5" strokeLinecap="round" />
+        <line x1="75" y1="16" x2="75" y2="30" stroke="#334155" strokeWidth="2.5" strokeLinecap="round" />
+        <circle cx="60" cy="38" r="9" fill="none" stroke="#334155" strokeWidth="2.5" />
+        <line x1="60" y1="47" x2="60" y2="78" stroke="#334155" strokeWidth="2.5" strokeLinecap="round" />
+        <line x1="60" y1="52" x2="45" y2="30" stroke="#334155" strokeWidth="2.5" strokeLinecap="round" />
+        <line x1="60" y1="52" x2="75" y2="30" stroke="#334155" strokeWidth="2.5" strokeLinecap="round" />
+        <line x1="60" y1="78" x2="50" y2="100" stroke="#334155" strokeWidth="2.5" strokeLinecap="round" />
+        <line x1="60" y1="78" x2="70" y2="100" stroke="#334155" strokeWidth="2.5" strokeLinecap="round" />
+      </g>
+    </svg>
+  );
+}
+
+function GluteBridgeVis({ playing }) {
+  return (
+    <svg viewBox="0 0 160 90" style={{ width: "100%", height: "100%" }}>
+      <style>{`
+        @keyframes bridge { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-12px)} }
+        .br-hip { animation: ${playing ? "bridge 2s ease-in-out infinite" : "none"}; }
+      `}</style>
+      <line x1="10" y1="75" x2="150" y2="75" stroke="#e2e8f0" strokeWidth="2" />
+      <circle cx="28" cy="60" r="8" fill="none" stroke="#334155" strokeWidth="2.5" />
+      <line x1="36" y1="62" x2="70" y2="55" stroke="#334155" strokeWidth="2.5" strokeLinecap="round" />
+      <g className="br-hip">
+        <line x1="70" y1="55" x2="80" y2="40" stroke="#334155" strokeWidth="2.5" strokeLinecap="round" />
+        <line x1="80" y1="40" x2="100" y2="55" stroke="#334155" strokeWidth="2.5" strokeLinecap="round" />
+      </g>
+      <line x1="100" y1="55" x2="105" y2="73" stroke="#334155" strokeWidth="2.5" strokeLinecap="round" />
+      <line x1="80" y1="55" x2="115" y2="73" stroke="#334155" strokeWidth="2.5" strokeLinecap="round" />
+    </svg>
+  );
+}
+
+function CalfRaiseVis({ playing }) {
+  return (
+    <svg viewBox="0 0 120 120" style={{ width: "100%", height: "100%" }}>
+      <style>{`
+        @keyframes calfUp { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-10px)} }
+        .calf-b { animation: ${playing ? "calfUp 1.4s ease-in-out infinite" : "none"}; }
+      `}</style>
+      <line x1="20" y1="108" x2="100" y2="108" stroke="#e2e8f0" strokeWidth="2" />
+      <g className="calf-b">
+        <circle cx="60" cy="20" r="9" fill="none" stroke="#334155" strokeWidth="2.5" />
+        <line x1="60" y1="29" x2="60" y2="62" stroke="#334155" strokeWidth="2.5" strokeLinecap="round" />
+        <line x1="60" y1="40" x2="45" y2="55" stroke="#334155" strokeWidth="2.5" strokeLinecap="round" />
+        <line x1="60" y1="40" x2="75" y2="55" stroke="#334155" strokeWidth="2.5" strokeLinecap="round" />
+        <line x1="60" y1="62" x2="52" y2="88" stroke="#334155" strokeWidth="2.5" strokeLinecap="round" />
+        <line x1="52" y1="88" x2="50" y2="106" stroke="#334155" strokeWidth="2.5" strokeLinecap="round" />
+        <line x1="60" y1="62" x2="68" y2="88" stroke="#334155" strokeWidth="2.5" strokeLinecap="round" />
+        <line x1="68" y1="88" x2="70" y2="106" stroke="#334155" strokeWidth="2.5" strokeLinecap="round" />
+      </g>
+    </svg>
+  );
+}
+
+function CrunchVis({ playing }) {
+  return (
+    <svg viewBox="0 0 160 90" style={{ width: "100%", height: "100%" }}>
+      <style>{`
+        @keyframes crunch { 0%,100%{transform:rotate(0deg)} 50%{transform:rotate(25deg)} }
+        .cr-torso { transform-origin: 70px 60px; animation: ${playing ? "crunch 1.8s ease-in-out infinite" : "none"}; }
+      `}</style>
+      <line x1="10" y1="75" x2="150" y2="75" stroke="#e2e8f0" strokeWidth="2" />
+      <g className="cr-torso">
+        <circle cx="40" cy="52" r="8" fill="none" stroke="#334155" strokeWidth="2.5" />
+        <line x1="48" y1="55" x2="80" y2="65" stroke="#334155" strokeWidth="2.5" strokeLinecap="round" />
+        <line x1="52" y1="54" x2="42" y2="42" stroke="#334155" strokeWidth="2.5" strokeLinecap="round" />
+        <line x1="58" y1="56" x2="50" y2="44" stroke="#334155" strokeWidth="2.5" strokeLinecap="round" />
+      </g>
+      <line x1="80" y1="68" x2="95" y2="50" stroke="#334155" strokeWidth="2.5" strokeLinecap="round" />
+      <line x1="95" y1="50" x2="100" y2="72" stroke="#334155" strokeWidth="2.5" strokeLinecap="round" />
+      <line x1="80" y1="68" x2="105" y2="55" stroke="#334155" strokeWidth="2.5" strokeLinecap="round" />
+      <line x1="105" y1="55" x2="115" y2="72" stroke="#334155" strokeWidth="2.5" strokeLinecap="round" />
+    </svg>
+  );
+}
+
+function LegRaiseVis({ playing }) {
+  return (
+    <svg viewBox="0 0 160 90" style={{ width: "100%", height: "100%" }}>
+      <style>{`
+        @keyframes legRaise { 0%,100%{transform:rotate(0deg)} 50%{transform:rotate(-50deg)} }
+        .lr-legs { transform-origin: 85px 62px; animation: ${playing ? "legRaise 2s ease-in-out infinite" : "none"}; }
+      `}</style>
+      <line x1="10" y1="75" x2="150" y2="75" stroke="#e2e8f0" strokeWidth="2" />
+      <circle cx="30" cy="56" r="8" fill="none" stroke="#334155" strokeWidth="2.5" />
+      <line x1="38" y1="58" x2="85" y2="62" stroke="#334155" strokeWidth="2.5" strokeLinecap="round" />
+      <line x1="42" y1="55" x2="35" y2="42" stroke="#334155" strokeWidth="2.5" strokeLinecap="round" />
+      <line x1="50" y1="57" x2="45" y2="44" stroke="#334155" strokeWidth="2.5" strokeLinecap="round" />
+      <g className="lr-legs">
+        <line x1="85" y1="62" x2="115" y2="68" stroke="#334155" strokeWidth="2.5" strokeLinecap="round" />
+        <line x1="85" y1="62" x2="120" y2="72" stroke="#334155" strokeWidth="2.5" strokeLinecap="round" />
+      </g>
+    </svg>
+  );
+}
+
+function JumpingJacksVis({ playing }) {
+  return (
+    <svg viewBox="0 0 120 120" style={{ width: "100%", height: "100%" }}>
+      <style>{`
+        @keyframes jjArms { 0%,100%{transform:rotate(0deg)} 50%{transform:rotate(-45deg)} }
+        @keyframes jjLegs { 0%,100%{transform:rotate(0deg)} 50%{transform:rotate(15deg)} }
+        @keyframes jjBounce { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-6px)} }
+        .jj-larm { transform-origin: 60px 42px; animation: ${playing ? "jjArms 0.7s ease-in-out infinite" : "none"}; }
+        .jj-rarm { transform-origin: 60px 42px; animation: ${playing ? "jjArms 0.7s ease-in-out infinite reverse" : "none"}; }
+        .jj-lleg { transform-origin: 60px 68px; animation: ${playing ? "jjLegs 0.7s ease-in-out infinite" : "none"}; }
+        .jj-rleg { transform-origin: 60px 68px; animation: ${playing ? "jjLegs 0.7s ease-in-out infinite reverse" : "none"}; }
+        .jj-body { animation: ${playing ? "jjBounce 0.7s ease-in-out infinite" : "none"}; }
+      `}</style>
+      <line x1="20" y1="108" x2="100" y2="108" stroke="#e2e8f0" strokeWidth="2" />
+      <g className="jj-body">
+        <circle cx="60" cy="24" r="9" fill="none" stroke="#334155" strokeWidth="2.5" />
+        <line x1="60" y1="33" x2="60" y2="68" stroke="#334155" strokeWidth="2.5" strokeLinecap="round" />
+        <g className="jj-larm"><line x1="60" y1="42" x2="40" y2="58" stroke="#334155" strokeWidth="2.5" strokeLinecap="round" /></g>
+        <g className="jj-rarm"><line x1="60" y1="42" x2="80" y2="58" stroke="#334155" strokeWidth="2.5" strokeLinecap="round" /></g>
+        <g className="jj-lleg"><line x1="60" y1="68" x2="46" y2="106" stroke="#334155" strokeWidth="2.5" strokeLinecap="round" /></g>
+        <g className="jj-rleg"><line x1="60" y1="68" x2="74" y2="106" stroke="#334155" strokeWidth="2.5" strokeLinecap="round" /></g>
+      </g>
+    </svg>
+  );
+}
+
+function HighKneesVis({ playing }) {
+  return (
+    <svg viewBox="0 0 120 120" style={{ width: "100%", height: "100%" }}>
+      <style>{`
+        @keyframes hkLeft { 0%,50%{transform:rotate(0deg)} 25%{transform:rotate(-40deg)} }
+        @keyframes hkRight { 0%,50%{transform:rotate(0deg)} 75%{transform:rotate(-40deg)} }
+        @keyframes hkBob { 0%,100%{transform:translateY(0)} 25%{transform:translateY(-4px)} 75%{transform:translateY(-4px)} }
+        .hk-ll { transform-origin: 55px 68px; animation: ${playing ? "hkLeft 1s ease-in-out infinite" : "none"}; }
+        .hk-rl { transform-origin: 65px 68px; animation: ${playing ? "hkRight 1s ease-in-out infinite" : "none"}; }
+        .hk-body { animation: ${playing ? "hkBob 1s ease-in-out infinite" : "none"}; }
+      `}</style>
+      <line x1="20" y1="108" x2="100" y2="108" stroke="#e2e8f0" strokeWidth="2" />
+      <g className="hk-body">
+        <circle cx="60" cy="22" r="9" fill="none" stroke="#334155" strokeWidth="2.5" />
+        <line x1="60" y1="31" x2="60" y2="68" stroke="#334155" strokeWidth="2.5" strokeLinecap="round" />
+        <line x1="60" y1="42" x2="42" y2="52" stroke="#334155" strokeWidth="2.5" strokeLinecap="round" />
+        <line x1="60" y1="42" x2="78" y2="52" stroke="#334155" strokeWidth="2.5" strokeLinecap="round" />
+        <g className="hk-ll">
+          <line x1="55" y1="68" x2="45" y2="88" stroke="#334155" strokeWidth="2.5" strokeLinecap="round" />
+          <line x1="45" y1="88" x2="43" y2="106" stroke="#334155" strokeWidth="2.5" strokeLinecap="round" />
+        </g>
+        <g className="hk-rl">
+          <line x1="65" y1="68" x2="75" y2="88" stroke="#334155" strokeWidth="2.5" strokeLinecap="round" />
+          <line x1="75" y1="88" x2="77" y2="106" stroke="#334155" strokeWidth="2.5" strokeLinecap="round" />
+        </g>
+      </g>
+    </svg>
+  );
+}
+
+function WallPushupVis({ playing }) {
+  return (
+    <svg viewBox="0 0 140 110" style={{ width: "100%", height: "100%" }}>
+      <style>{`
+        @keyframes wallpu { 0%,100%{transform:rotate(0deg)} 50%{transform:rotate(6deg)} }
+        .wpu { transform-origin: 55px 100px; animation: ${playing ? "wallpu 2s ease-in-out infinite" : "none"}; }
+      `}</style>
+      <rect x="10" y="5" width="8" height="100" rx="2" fill="#cbd5e1" />
+      <line x1="10" y1="105" x2="130" y2="105" stroke="#e2e8f0" strokeWidth="2" />
+      <g className="wpu">
+        <circle cx="55" cy="28" r="8" fill="none" stroke="#334155" strokeWidth="2.5" />
+        <line x1="55" y1="36" x2="55" y2="68" stroke="#334155" strokeWidth="2.5" strokeLinecap="round" />
+        <line x1="55" y1="46" x2="22" y2="38" stroke="#334155" strokeWidth="2.5" strokeLinecap="round" />
+        <line x1="55" y1="46" x2="22" y2="44" stroke="#334155" strokeWidth="2.5" strokeLinecap="round" />
+        <circle cx="22" cy="38" r="2" fill="#334155" />
+        <circle cx="22" cy="44" r="2" fill="#334155" />
+        <line x1="55" y1="68" x2="48" y2="100" stroke="#334155" strokeWidth="2.5" strokeLinecap="round" />
+        <line x1="55" y1="68" x2="62" y2="100" stroke="#334155" strokeWidth="2.5" strokeLinecap="round" />
+      </g>
+    </svg>
+  );
+}
+
+function ChairSitStandVis({ playing }) {
+  return (
+    <svg viewBox="0 0 130 120" style={{ width: "100%", height: "100%" }}>
+      <style>{`
+        @keyframes sitstand { 0%,100%{transform:translateY(14px)} 50%{transform:translateY(0)} }
+        .ss-b { animation: ${playing ? "sitstand 2.2s ease-in-out infinite" : "none"}; }
+      `}</style>
+      <rect x="70" y="55" width="35" height="5" rx="2" fill="#94a3b8" />
+      <line x1="72" y1="60" x2="72" y2="108" stroke="#94a3b8" strokeWidth="2.5" />
+      <line x1="103" y1="60" x2="103" y2="108" stroke="#94a3b8" strokeWidth="2.5" />
+      <rect x="98" y="40" width="8" height="20" rx="2" fill="#94a3b8" />
+      <line x1="20" y1="108" x2="115" y2="108" stroke="#e2e8f0" strokeWidth="2" />
+      <g className="ss-b">
+        <circle cx="60" cy="22" r="9" fill="none" stroke="#334155" strokeWidth="2.5" />
+        <line x1="60" y1="31" x2="60" y2="60" stroke="#334155" strokeWidth="2.5" strokeLinecap="round" />
+        <line x1="60" y1="42" x2="45" y2="52" stroke="#334155" strokeWidth="2.5" strokeLinecap="round" />
+        <line x1="60" y1="42" x2="75" y2="52" stroke="#334155" strokeWidth="2.5" strokeLinecap="round" />
+        <line x1="60" y1="60" x2="48" y2="82" stroke="#334155" strokeWidth="2.5" strokeLinecap="round" />
+        <line x1="48" y1="82" x2="45" y2="106" stroke="#334155" strokeWidth="2.5" strokeLinecap="round" />
+        <line x1="60" y1="60" x2="72" y2="82" stroke="#334155" strokeWidth="2.5" strokeLinecap="round" />
+        <line x1="72" y1="82" x2="75" y2="106" stroke="#334155" strokeWidth="2.5" strokeLinecap="round" />
+      </g>
+    </svg>
+  );
+}
+
+function WalkVis({ playing }) {
+  return (
+    <svg viewBox="0 0 120 120" style={{ width: "100%", height: "100%" }}>
+      <style>{`
+        @keyframes walkL { 0%,100%{transform:rotate(-15deg)} 50%{transform:rotate(15deg)} }
+        @keyframes walkR { 0%,100%{transform:rotate(15deg)} 50%{transform:rotate(-15deg)} }
+        @keyframes walkAL { 0%,100%{transform:rotate(10deg)} 50%{transform:rotate(-10deg)} }
+        @keyframes walkAR { 0%,100%{transform:rotate(-10deg)} 50%{transform:rotate(10deg)} }
+        .wk-ll { transform-origin: 58px 65px; animation: ${playing ? "walkL 1s ease-in-out infinite" : "none"}; }
+        .wk-rl { transform-origin: 62px 65px; animation: ${playing ? "walkR 1s ease-in-out infinite" : "none"}; }
+        .wk-la { transform-origin: 58px 42px; animation: ${playing ? "walkAL 1s ease-in-out infinite" : "none"}; }
+        .wk-ra { transform-origin: 62px 42px; animation: ${playing ? "walkAR 1s ease-in-out infinite" : "none"}; }
+      `}</style>
+      <line x1="20" y1="108" x2="100" y2="108" stroke="#e2e8f0" strokeWidth="2" />
+      <circle cx="60" cy="22" r="9" fill="none" stroke="#334155" strokeWidth="2.5" />
+      <line x1="60" y1="31" x2="60" y2="65" stroke="#334155" strokeWidth="2.5" strokeLinecap="round" />
+      <g className="wk-la"><line x1="58" y1="42" x2="42" y2="56" stroke="#334155" strokeWidth="2.5" strokeLinecap="round" /></g>
+      <g className="wk-ra"><line x1="62" y1="42" x2="78" y2="56" stroke="#334155" strokeWidth="2.5" strokeLinecap="round" /></g>
+      <g className="wk-ll"><line x1="58" y1="65" x2="46" y2="106" stroke="#334155" strokeWidth="2.5" strokeLinecap="round" /></g>
+      <g className="wk-rl"><line x1="62" y1="65" x2="74" y2="106" stroke="#334155" strokeWidth="2.5" strokeLinecap="round" /></g>
+    </svg>
+  );
+}
+
+function SeatedArmRaiseVis({ playing }) {
+  return (
+    <svg viewBox="0 0 130 120" style={{ width: "100%", height: "100%" }}>
+      <style>{`
+        @keyframes armRaise { 0%,100%{transform:rotate(0deg)} 50%{transform:rotate(-60deg)} }
+        .ar-arms { transform-origin: 60px 48px; animation: ${playing ? "armRaise 2s ease-in-out infinite" : "none"}; }
+      `}</style>
+      <rect x="40" y="62" width="40" height="5" rx="2" fill="#94a3b8" />
+      <line x1="42" y1="67" x2="42" y2="108" stroke="#94a3b8" strokeWidth="2" />
+      <line x1="78" y1="67" x2="78" y2="108" stroke="#94a3b8" strokeWidth="2" />
+      <line x1="20" y1="108" x2="110" y2="108" stroke="#e2e8f0" strokeWidth="2" />
+      <circle cx="60" cy="30" r="9" fill="none" stroke="#334155" strokeWidth="2.5" />
+      <line x1="60" y1="39" x2="60" y2="62" stroke="#334155" strokeWidth="2.5" strokeLinecap="round" />
+      <g className="ar-arms">
+        <line x1="60" y1="48" x2="42" y2="62" stroke="#334155" strokeWidth="2.5" strokeLinecap="round" />
+        <rect x="38" y="59" width="6" height="4" rx="2" fill="#64748b" />
+        <line x1="60" y1="48" x2="78" y2="62" stroke="#334155" strokeWidth="2.5" strokeLinecap="round" />
+        <rect x="76" y="59" width="6" height="4" rx="2" fill="#64748b" />
+      </g>
+      <line x1="60" y1="62" x2="50" y2="80" stroke="#334155" strokeWidth="2.5" strokeLinecap="round" />
+      <line x1="50" y1="80" x2="48" y2="106" stroke="#334155" strokeWidth="2.5" strokeLinecap="round" />
+      <line x1="60" y1="62" x2="70" y2="80" stroke="#334155" strokeWidth="2.5" strokeLinecap="round" />
+      <line x1="70" y1="80" x2="72" y2="106" stroke="#334155" strokeWidth="2.5" strokeLinecap="round" />
+    </svg>
+  );
+}
+
+function StandingLegRaiseVis({ playing }) {
+  return (
+    <svg viewBox="0 0 130 120" style={{ width: "100%", height: "100%" }}>
+      <style>{`
+        @keyframes slegR { 0%,100%{transform:rotate(0deg)} 50%{transform:rotate(-40deg)} }
+        .slr-leg { transform-origin: 65px 68px; animation: ${playing ? "slegR 2s ease-in-out infinite" : "none"}; }
+      `}</style>
+      <rect x="85" y="40" width="8" height="68" rx="2" fill="#94a3b8" />
+      <line x1="20" y1="108" x2="110" y2="108" stroke="#e2e8f0" strokeWidth="2" />
+      <circle cx="60" cy="22" r="9" fill="none" stroke="#334155" strokeWidth="2.5" />
+      <line x1="60" y1="31" x2="60" y2="68" stroke="#334155" strokeWidth="2.5" strokeLinecap="round" />
+      <line x1="60" y1="42" x2="80" y2="52" stroke="#334155" strokeWidth="2.5" strokeLinecap="round" />
+      <line x1="60" y1="42" x2="45" y2="55" stroke="#334155" strokeWidth="2.5" strokeLinecap="round" />
+      <line x1="60" y1="68" x2="52" y2="90" stroke="#334155" strokeWidth="2.5" strokeLinecap="round" />
+      <line x1="52" y1="90" x2="50" y2="106" stroke="#334155" strokeWidth="2.5" strokeLinecap="round" />
+      <g className="slr-leg">
+        <line x1="65" y1="68" x2="73" y2="90" stroke="#334155" strokeWidth="2.5" strokeLinecap="round" />
+        <line x1="73" y1="90" x2="78" y2="106" stroke="#334155" strokeWidth="2.5" strokeLinecap="round" />
+      </g>
+    </svg>
+  );
+}
+
+function SuryaNamaskarVis({ playing }) {
+  return (
+    <svg viewBox="0 0 120 120" style={{ width: "100%", height: "100%" }}>
+      <style>{`
+        @keyframes sunSal { 0%,100%{transform:scale(1)} 50%{transform:scale(1.08)} }
+        @keyframes sunRays { 0%{transform:rotate(0deg)} 100%{transform:rotate(360deg)} }
+        .sn-body { animation: ${playing ? "sunSal 3s ease-in-out infinite" : "none"}; }
+        .sn-sun { transform-origin: 60px 15px; animation: ${playing ? "sunRays 8s linear infinite" : "none"}; }
+      `}</style>
+      <g className="sn-sun">
+        <circle cx="60" cy="15" r="6" fill="#fbbf24" />
+        {[0,45,90,135,180,225,270,315].map(a => 
+          <line key={a} x1="60" y1="15" x2={60+Math.cos(a*Math.PI/180)*12} y2={15+Math.sin(a*Math.PI/180)*12} stroke="#fbbf24" strokeWidth="1.5" strokeLinecap="round" />
+        )}
+      </g>
+      <g className="sn-body">
+        <circle cx="60" cy="38" r="8" fill="none" stroke="#334155" strokeWidth="2.5" />
+        <line x1="60" y1="46" x2="60" y2="72" stroke="#334155" strokeWidth="2.5" strokeLinecap="round" />
+        <line x1="60" y1="54" x2="44" y2="44" stroke="#334155" strokeWidth="2.5" strokeLinecap="round" />
+        <line x1="60" y1="54" x2="76" y2="44" stroke="#334155" strokeWidth="2.5" strokeLinecap="round" />
+        <line x1="60" y1="72" x2="48" y2="96" stroke="#334155" strokeWidth="2.5" strokeLinecap="round" />
+        <line x1="60" y1="72" x2="72" y2="96" stroke="#334155" strokeWidth="2.5" strokeLinecap="round" />
+      </g>
+      <text x="60" y="112" textAnchor="middle" fontSize="7" fill="#d97706">Namaste</text>
+    </svg>
+  );
+}
+
+function DownDogVis({ playing }) {
+  return (
+    <svg viewBox="0 0 150 100" style={{ width: "100%", height: "100%" }}>
+      <style>{`
+        @keyframes ddBreathe { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-2px)} }
+        .dd { animation: ${playing ? "ddBreathe 3s ease-in-out infinite" : "none"}; }
+      `}</style>
+      <line x1="10" y1="85" x2="140" y2="85" stroke="#e2e8f0" strokeWidth="2" />
+      <g className="dd">
+        <circle cx="40" cy="35" r="7" fill="none" stroke="#334155" strokeWidth="2.5" />
+        <line x1="45" y1="40" x2="75" y2="22" stroke="#334155" strokeWidth="2.5" strokeLinecap="round" />
+        <line x1="75" y1="22" x2="110" y2="82" stroke="#334155" strokeWidth="2.5" strokeLinecap="round" />
+        <line x1="40" y1="42" x2="38" y2="82" stroke="#334155" strokeWidth="2.5" strokeLinecap="round" />
+        <line x1="44" y1="42" x2="48" y2="82" stroke="#334155" strokeWidth="2.5" strokeLinecap="round" />
+      </g>
+    </svg>
+  );
+}
+
+function BoatPoseVis({ playing }) {
+  return (
+    <svg viewBox="0 0 140 100" style={{ width: "100%", height: "100%" }}>
+      <style>{`
+        @keyframes boatHold { 0%,100%{transform:rotate(0deg)} 50%{transform:rotate(2deg)} }
+        .boat { transform-origin: 70px 65px; animation: ${playing ? "boatHold 2s ease-in-out infinite" : "none"}; }
+      `}</style>
+      <line x1="10" y1="85" x2="130" y2="85" stroke="#e2e8f0" strokeWidth="2" />
+      <g className="boat">
+        <circle cx="55" cy="35" r="7" fill="none" stroke="#334155" strokeWidth="2.5" />
+        <line x1="58" y1="42" x2="70" y2="65" stroke="#334155" strokeWidth="2.5" strokeLinecap="round" />
+        <line x1="70" y1="65" x2="100" y2="40" stroke="#334155" strokeWidth="2.5" strokeLinecap="round" />
+        <line x1="58" y1="48" x2="85" y2="30" stroke="#334155" strokeWidth="2.5" strokeLinecap="round" />
+        <line x1="62" y1="50" x2="90" y2="34" stroke="#334155" strokeWidth="2.5" strokeLinecap="round" />
+      </g>
+    </svg>
+  );
+}
+
+function CobraVis({ playing }) {
+  return (
+    <svg viewBox="0 0 150 90" style={{ width: "100%", height: "100%" }}>
+      <style>{`
+        @keyframes cobraUp { 0%,100%{transform:rotate(0deg)} 50%{transform:rotate(-8deg)} }
+        .cobra-up { transform-origin: 60px 62px; animation: ${playing ? "cobraUp 3s ease-in-out infinite" : "none"}; }
+      `}</style>
+      <line x1="10" y1="78" x2="140" y2="78" stroke="#e2e8f0" strokeWidth="2" />
+      <line x1="60" y1="72" x2="125" y2="74" stroke="#334155" strokeWidth="2.5" strokeLinecap="round" />
+      <g className="cobra-up">
+        <circle cx="38" cy="40" r="7" fill="none" stroke="#334155" strokeWidth="2.5" />
+        <line x1="42" y1="46" x2="60" y2="62" stroke="#334155" strokeWidth="2.5" strokeLinecap="round" />
+        <line x1="48" y1="52" x2="48" y2="72" stroke="#334155" strokeWidth="2.5" strokeLinecap="round" />
+        <line x1="55" y1="58" x2="55" y2="72" stroke="#334155" strokeWidth="2.5" strokeLinecap="round" />
+      </g>
+    </svg>
+  );
+}
+
+function WarriorVis({ playing }) {
+  return (
+    <svg viewBox="0 0 140 120" style={{ width: "100%", height: "100%" }}>
+      <style>{`
+        @keyframes warBreathe { 0%,100%{transform:scale(1)} 50%{transform:scale(1.02)} }
+        .war { animation: ${playing ? "warBreathe 3s ease-in-out infinite" : "none"}; }
+      `}</style>
+      <line x1="10" y1="108" x2="130" y2="108" stroke="#e2e8f0" strokeWidth="2" />
+      <g className="war">
+        <circle cx="70" cy="22" r="8" fill="none" stroke="#334155" strokeWidth="2.5" />
+        <line x1="70" y1="30" x2="70" y2="62" stroke="#334155" strokeWidth="2.5" strokeLinecap="round" />
+        <line x1="70" y1="40" x2="40" y2="40" stroke="#334155" strokeWidth="2.5" strokeLinecap="round" />
+        <line x1="70" y1="40" x2="100" y2="40" stroke="#334155" strokeWidth="2.5" strokeLinecap="round" />
+        <line x1="70" y1="62" x2="45" y2="85" stroke="#334155" strokeWidth="2.5" strokeLinecap="round" />
+        <line x1="45" y1="85" x2="35" y2="106" stroke="#334155" strokeWidth="2.5" strokeLinecap="round" />
+        <line x1="70" y1="62" x2="95" y2="82" stroke="#334155" strokeWidth="2.5" strokeLinecap="round" />
+        <line x1="95" y1="82" x2="105" y2="106" stroke="#334155" strokeWidth="2.5" strokeLinecap="round" />
+      </g>
+    </svg>
+  );
+}
+
+function ChairPoseVis({ playing }) {
+  return (
+    <svg viewBox="0 0 120 120" style={{ width: "100%", height: "100%" }}>
+      <style>{`
+        @keyframes chairH { 0%,100%{transform:translateY(0)} 50%{transform:translateY(2px)} }
+        .ch-p { animation: ${playing ? "chairH 2.5s ease-in-out infinite" : "none"}; }
+      `}</style>
+      <line x1="20" y1="108" x2="100" y2="108" stroke="#e2e8f0" strokeWidth="2" />
+      <g className="ch-p">
+        <circle cx="60" cy="18" r="8" fill="none" stroke="#334155" strokeWidth="2.5" />
+        <line x1="60" y1="26" x2="60" y2="58" stroke="#334155" strokeWidth="2.5" strokeLinecap="round" />
+        <line x1="60" y1="34" x2="48" y2="14" stroke="#334155" strokeWidth="2.5" strokeLinecap="round" />
+        <line x1="60" y1="34" x2="72" y2="14" stroke="#334155" strokeWidth="2.5" strokeLinecap="round" />
+        <line x1="60" y1="58" x2="48" y2="78" stroke="#334155" strokeWidth="2.5" strokeLinecap="round" />
+        <line x1="48" y1="78" x2="48" y2="106" stroke="#334155" strokeWidth="2.5" strokeLinecap="round" />
+        <line x1="60" y1="58" x2="72" y2="78" stroke="#334155" strokeWidth="2.5" strokeLinecap="round" />
+        <line x1="72" y1="78" x2="72" y2="106" stroke="#334155" strokeWidth="2.5" strokeLinecap="round" />
+      </g>
+    </svg>
+  );
+}
+
+function SidePlankVis({ playing }) {
+  return (
+    <svg viewBox="0 0 150 90" style={{ width: "100%", height: "100%" }}>
+      <style>{`
+        @keyframes spHold { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-2px)} }
+        .sp-b { animation: ${playing ? "spHold 2s ease-in-out infinite" : "none"}; }
+      `}</style>
+      <line x1="10" y1="78" x2="140" y2="78" stroke="#e2e8f0" strokeWidth="2" />
+      <g className="sp-b">
+        <circle cx="90" cy="22" r="7" fill="none" stroke="#334155" strokeWidth="2.5" />
+        <line x1="87" y1="28" x2="65" y2="58" stroke="#334155" strokeWidth="2.5" strokeLinecap="round" />
+        <line x1="90" y1="24" x2="98" y2="10" stroke="#334155" strokeWidth="2.5" strokeLinecap="round" />
+        <line x1="65" y1="58" x2="35" y2="74" stroke="#334155" strokeWidth="2.5" strokeLinecap="round" />
+        <line x1="80" y1="42" x2="65" y2="74" stroke="#334155" strokeWidth="2.5" strokeLinecap="round" />
+      </g>
+    </svg>
+  );
+}
+
+function BridgePoseVis({ playing }) {
+  return GluteBridgeVis({ playing });
+}
+
+function TreePoseVis({ playing }) {
+  return (
+    <svg viewBox="0 0 120 120" style={{ width: "100%", height: "100%" }}>
+      <style>{`
+        @keyframes treeSway { 0%,100%{transform:rotate(-1deg)} 50%{transform:rotate(1deg)} }
+        .tree-b { transform-origin: 60px 106px; animation: ${playing ? "treeSway 3s ease-in-out infinite" : "none"}; }
+      `}</style>
+      <line x1="20" y1="108" x2="100" y2="108" stroke="#e2e8f0" strokeWidth="2" />
+      <g className="tree-b">
+        <circle cx="60" cy="18" r="8" fill="none" stroke="#334155" strokeWidth="2.5" />
+        <line x1="60" y1="26" x2="60" y2="65" stroke="#334155" strokeWidth="2.5" strokeLinecap="round" />
+        <line x1="60" y1="34" x2="52" y2="14" stroke="#334155" strokeWidth="2.5" strokeLinecap="round" />
+        <line x1="60" y1="34" x2="68" y2="14" stroke="#334155" strokeWidth="2.5" strokeLinecap="round" />
+        <line x1="60" y1="65" x2="58" y2="106" stroke="#334155" strokeWidth="2.5" strokeLinecap="round" />
+        <line x1="60" y1="75" x2="74" y2="68" stroke="#334155" strokeWidth="2.5" strokeLinecap="round" />
+        <line x1="74" y1="68" x2="68" y2="85" stroke="#334155" strokeWidth="2.5" strokeLinecap="round" />
+      </g>
+    </svg>
+  );
+}
+
+function CatCowVis({ playing }) {
+  return (
+    <svg viewBox="0 0 150 90" style={{ width: "100%", height: "100%" }}>
+      <style>{`
+        @keyframes catcow { 0%,100%{d:path("M40,45 Q70,30 100,45")} 50%{d:path("M40,45 Q70,58 100,45")} }
+        .cc-spine { animation: ${playing ? "catcow 3s ease-in-out infinite" : "none"}; }
+      `}</style>
+      <line x1="10" y1="78" x2="140" y2="78" stroke="#e2e8f0" strokeWidth="2" />
+      <circle cx="105" cy="35" r="7" fill="none" stroke="#334155" strokeWidth="2.5" />
+      <line x1="40" y1="45" x2="40" y2="76" stroke="#334155" strokeWidth="2.5" strokeLinecap="round" />
+      <line x1="50" y1="45" x2="50" y2="76" stroke="#334155" strokeWidth="2.5" strokeLinecap="round" />
+      <line x1="90" y1="45" x2="90" y2="76" stroke="#334155" strokeWidth="2.5" strokeLinecap="round" />
+      <line x1="100" y1="45" x2="100" y2="76" stroke="#334155" strokeWidth="2.5" strokeLinecap="round" />
+      <path d="M40,45 Q70,30 100,42" fill="none" stroke="#334155" strokeWidth="2.5" strokeLinecap="round">
+        {playing && <animate attributeName="d" values="M40,45 Q70,30 100,42;M40,45 Q70,58 100,42;M40,45 Q70,30 100,42" dur="3s" repeatCount="indefinite" />}
+      </path>
+    </svg>
+  );
+}
+
+function LegsUpWallVis({ playing }) {
+  return (
+    <svg viewBox="0 0 120 120" style={{ width: "100%", height: "100%" }}>
+      <style>{`
+        @keyframes luwRelax { 0%,100%{opacity:0.7} 50%{opacity:1} }
+        .luw { animation: ${playing ? "luwRelax 3s ease-in-out infinite" : "none"}; }
+      `}</style>
+      <rect x="90" y="5" width="8" height="110" rx="2" fill="#cbd5e1" />
+      <line x1="10" y1="80" x2="90" y2="80" stroke="#e2e8f0" strokeWidth="2" />
+      <g className="luw">
+        <circle cx="40" cy="72" r="7" fill="none" stroke="#334155" strokeWidth="2.5" />
+        <line x1="47" y1="72" x2="70" y2="72" stroke="#334155" strokeWidth="2.5" strokeLinecap="round" />
+        <line x1="50" y1="70" x2="50" y2="55" stroke="#334155" strokeWidth="2.5" strokeLinecap="round" />
+        <line x1="55" y1="70" x2="55" y2="55" stroke="#334155" strokeWidth="2.5" strokeLinecap="round" />
+        <line x1="70" y1="72" x2="86" y2="52" stroke="#334155" strokeWidth="2.5" strokeLinecap="round" />
+        <line x1="70" y1="72" x2="86" y2="40" stroke="#334155" strokeWidth="2.5" strokeLinecap="round" />
+      </g>
+    </svg>
+  );
+}
+
+function ShavasanaVis({ playing }) {
+  return (
+    <svg viewBox="0 0 160 70" style={{ width: "100%", height: "100%" }}>
+      <style>{`
+        @keyframes breathe { 0%,100%{transform:scaleY(1)} 50%{transform:scaleY(1.04)} }
+        .shav { transform-origin: 80px 40px; animation: ${playing ? "breathe 4s ease-in-out infinite" : "none"}; }
+      `}</style>
+      <line x1="5" y1="52" x2="155" y2="52" stroke="#e2e8f0" strokeWidth="2" />
+      <g className="shav">
+        <circle cx="25" cy="42" r="7" fill="none" stroke="#334155" strokeWidth="2.5" />
+        <line x1="32" y1="42" x2="90" y2="42" stroke="#334155" strokeWidth="2.5" strokeLinecap="round" />
+        <line x1="40" y1="42" x2="30" y2="28" stroke="#334155" strokeWidth="2.5" strokeLinecap="round" />
+        <line x1="50" y1="42" x2="42" y2="28" stroke="#334155" strokeWidth="2.5" strokeLinecap="round" />
+        <line x1="90" y1="42" x2="115" y2="50" stroke="#334155" strokeWidth="2.5" strokeLinecap="round" />
+        <line x1="90" y1="42" x2="120" y2="48" stroke="#334155" strokeWidth="2.5" strokeLinecap="round" />
+      </g>
+      {playing && <text x="80" y="65" textAnchor="middle" fontSize="7" fill="#16a34a">Breathe...</text>}
+    </svg>
+  );
+}
+
+function ForwardFoldVis({ playing }) {
+  return (
+    <svg viewBox="0 0 120 110" style={{ width: "100%", height: "100%" }}>
+      <style>{`
+        @keyframes foldDeep { 0%,100%{transform:rotate(0deg)} 50%{transform:rotate(5deg)} }
+        .fold-t { transform-origin: 60px 58px; animation: ${playing ? "foldDeep 3s ease-in-out infinite" : "none"}; }
+      `}</style>
+      <line x1="20" y1="100" x2="100" y2="100" stroke="#e2e8f0" strokeWidth="2" />
+      <line x1="55" y1="58" x2="50" y2="98" stroke="#334155" strokeWidth="2.5" strokeLinecap="round" />
+      <line x1="65" y1="58" x2="70" y2="98" stroke="#334155" strokeWidth="2.5" strokeLinecap="round" />
+      <g className="fold-t">
+        <line x1="60" y1="58" x2="60" y2="30" stroke="#334155" strokeWidth="2.5" strokeLinecap="round" />
+        <circle cx="55" cy="75" r="7" fill="none" stroke="#334155" strokeWidth="2.5" />
+        <line x1="58" y1="40" x2="48" y2="90" stroke="#334155" strokeWidth="2.5" strokeLinecap="round" />
+        <line x1="62" y1="40" x2="52" y2="92" stroke="#334155" strokeWidth="2.5" strokeLinecap="round" />
+      </g>
+    </svg>
+  );
+}
+
+function TriangleVis({ playing }) {
+  return (
+    <svg viewBox="0 0 140 120" style={{ width: "100%", height: "100%" }}>
+      <style>{`
+        @keyframes triHold { 0%,100%{transform:rotate(0deg)} 50%{transform:rotate(2deg)} }
+        .tri-b { transform-origin: 70px 65px; animation: ${playing ? "triHold 3s ease-in-out infinite" : "none"}; }
+      `}</style>
+      <line x1="10" y1="108" x2="130" y2="108" stroke="#e2e8f0" strokeWidth="2" />
+      <g className="tri-b">
+        <circle cx="55" cy="30" r="7" fill="none" stroke="#334155" strokeWidth="2.5" />
+        <line x1="58" y1="36" x2="70" y2="65" stroke="#334155" strokeWidth="2.5" strokeLinecap="round" />
+        <line x1="56" y1="40" x2="42" y2="95" stroke="#334155" strokeWidth="2.5" strokeLinecap="round" />
+        <line x1="62" y1="45" x2="80" y2="18" stroke="#334155" strokeWidth="2.5" strokeLinecap="round" />
+        <line x1="70" y1="65" x2="45" y2="106" stroke="#334155" strokeWidth="2.5" strokeLinecap="round" />
+        <line x1="70" y1="65" x2="100" y2="106" stroke="#334155" strokeWidth="2.5" strokeLinecap="round" />
+      </g>
+    </svg>
+  );
+}
+
+function ChildPoseVis({ playing }) {
+  return (
+    <svg viewBox="0 0 150 80" style={{ width: "100%", height: "100%" }}>
+      <style>{`
+        @keyframes childBreathe { 0%,100%{transform:scaleY(1)} 50%{transform:scaleY(1.03)} }
+        .child-b { transform-origin: 75px 55px; animation: ${playing ? "childBreathe 4s ease-in-out infinite" : "none"}; }
+      `}</style>
+      <line x1="10" y1="68" x2="140" y2="68" stroke="#e2e8f0" strokeWidth="2" />
+      <g className="child-b">
+        <circle cx="40" cy="52" r="7" fill="none" stroke="#334155" strokeWidth="2.5" />
+        <line x1="47" y1="55" x2="85" y2="52" stroke="#334155" strokeWidth="2.5" strokeLinecap="round" />
+        <line x1="85" y1="52" x2="100" y2="45" stroke="#334155" strokeWidth="2.5" strokeLinecap="round" />
+        <line x1="100" y1="45" x2="105" y2="65" stroke="#334155" strokeWidth="2.5" strokeLinecap="round" />
+        <line x1="38" y1="58" x2="25" y2="55" stroke="#334155" strokeWidth="2.5" strokeLinecap="round" />
+        <line x1="42" y1="58" x2="28" y2="58" stroke="#334155" strokeWidth="2.5" strokeLinecap="round" />
+      </g>
+    </svg>
+  );
+}
+
+function GobletSquatVis({ playing }) {
+  return (
+    <svg viewBox="0 0 120 120" style={{ width: "100%", height: "100%" }}>
+      <style>{`
+        @keyframes gobsq { 0%,100%{transform:translateY(0)} 50%{transform:translateY(16px)} }
+        .gs-b { animation: ${playing ? "gobsq 2.2s ease-in-out infinite" : "none"}; }
+      `}</style>
+      <line x1="20" y1="108" x2="100" y2="108" stroke="#e2e8f0" strokeWidth="2" />
+      <g className="gs-b">
+        <circle cx="60" cy="18" r="8" fill="none" stroke="#334155" strokeWidth="2.5" />
+        <line x1="60" y1="26" x2="60" y2="60" stroke="#334155" strokeWidth="2.5" strokeLinecap="round" />
+        <line x1="60" y1="38" x2="52" y2="48" stroke="#334155" strokeWidth="2.5" strokeLinecap="round" />
+        <line x1="60" y1="38" x2="68" y2="48" stroke="#334155" strokeWidth="2.5" strokeLinecap="round" />
+        <rect x="50" y="46" width="20" height="6" rx="3" fill="#64748b" />
+        <line x1="60" y1="60" x2="46" y2="80" stroke="#334155" strokeWidth="2.5" strokeLinecap="round" />
+        <line x1="46" y1="80" x2="44" y2="106" stroke="#334155" strokeWidth="2.5" strokeLinecap="round" />
+        <line x1="60" y1="60" x2="74" y2="80" stroke="#334155" strokeWidth="2.5" strokeLinecap="round" />
+        <line x1="74" y1="80" x2="76" y2="106" stroke="#334155" strokeWidth="2.5" strokeLinecap="round" />
+      </g>
+    </svg>
+  );
+}
+
+function TricepPushdownVis({ playing }) {
+  return (
+    <svg viewBox="0 0 120 120" style={{ width: "100%", height: "100%" }}>
+      <style>{`
+        @keyframes tpd { 0%,100%{transform:rotate(0deg)} 50%{transform:rotate(40deg)} }
+        .tpd-fore { transform-origin: 68px 55px; animation: ${playing ? "tpd 1.6s ease-in-out infinite" : "none"}; }
+      `}</style>
+      <line x1="80" y1="5" x2="80" y2="20" stroke="#94a3b8" strokeWidth="2" />
+      <line x1="20" y1="108" x2="100" y2="108" stroke="#e2e8f0" strokeWidth="2" />
+      <circle cx="60" cy="24" r="8" fill="none" stroke="#334155" strokeWidth="2.5" />
+      <line x1="60" y1="32" x2="60" y2="66" stroke="#334155" strokeWidth="2.5" strokeLinecap="round" />
+      <line x1="60" y1="42" x2="50" y2="55" stroke="#334155" strokeWidth="2.5" strokeLinecap="round" />
+      <line x1="60" y1="42" x2="68" y2="55" stroke="#334155" strokeWidth="2.5" strokeLinecap="round" />
+      <g className="tpd-fore">
+        <line x1="68" y1="55" x2="78" y2="40" stroke="#334155" strokeWidth="2.5" strokeLinecap="round" />
+      </g>
+      <line x1="60" y1="66" x2="50" y2="90" stroke="#334155" strokeWidth="2.5" strokeLinecap="round" />
+      <line x1="50" y1="90" x2="48" y2="106" stroke="#334155" strokeWidth="2.5" strokeLinecap="round" />
+      <line x1="60" y1="66" x2="70" y2="90" stroke="#334155" strokeWidth="2.5" strokeLinecap="round" />
+      <line x1="70" y1="90" x2="72" y2="106" stroke="#334155" strokeWidth="2.5" strokeLinecap="round" />
+    </svg>
+  );
+}
+
+function FacePullVis({ playing }) {
+  return (
+    <svg viewBox="0 0 140 110" style={{ width: "100%", height: "100%" }}>
+      <style>{`
+        @keyframes fpull { 0%,100%{transform:translateX(0)} 50%{transform:translateX(-15px)} }
+        .fp-arms { animation: ${playing ? "fpull 1.8s ease-in-out infinite" : "none"}; }
+      `}</style>
+      <rect x="8" y="20" width="6" height="70" rx="2" fill="#94a3b8" />
+      <line x1="20" y1="100" x2="120" y2="100" stroke="#e2e8f0" strokeWidth="2" />
+      <circle cx="75" cy="24" r="8" fill="none" stroke="#334155" strokeWidth="2.5" />
+      <line x1="75" y1="32" x2="75" y2="66" stroke="#334155" strokeWidth="2.5" strokeLinecap="round" />
+      <g className="fp-arms">
+        <line x1="75" y1="42" x2="40" y2="38" stroke="#334155" strokeWidth="2.5" strokeLinecap="round" />
+        <line x1="40" y1="38" x2="14" y2="45" stroke="#94a3b8" strokeWidth="2" strokeDasharray="3 2" />
+        <line x1="75" y1="42" x2="40" y2="46" stroke="#334155" strokeWidth="2.5" strokeLinecap="round" />
+        <line x1="40" y1="46" x2="14" y2="50" stroke="#94a3b8" strokeWidth="2" strokeDasharray="3 2" />
+      </g>
+      <line x1="75" y1="66" x2="65" y2="96" stroke="#334155" strokeWidth="2.5" strokeLinecap="round" />
+      <line x1="75" y1="66" x2="85" y2="96" stroke="#334155" strokeWidth="2.5" strokeLinecap="round" />
+    </svg>
+  );
+}
+
+function TubePullVis({ playing }) { return FacePullVis({ playing }); }
+
+function HIITVis({ playing }) { return JumpingJacksVis({ playing }); }
+
+function PranayamaVis({ playing }) {
+  return (
+    <svg viewBox="0 0 120 120" style={{ width: "100%", height: "100%" }}>
+      <style>{`
+        @keyframes pranBreath { 0%,100%{r:8; opacity:0.3} 50%{r:22; opacity:0.1} }
+        @keyframes pranBody { 0%,100%{transform:scale(1)} 50%{transform:scale(1.02)} }
+        .pran-aura { animation: ${playing ? "pranBreath 4s ease-in-out infinite" : "none"}; }
+        .pran-b { animation: ${playing ? "pranBody 4s ease-in-out infinite" : "none"}; transform-origin: 60px 50px; }
+      `}</style>
+      <circle className="pran-aura" cx="60" cy="50" r="22" fill="#38bdf8" opacity="0.1" />
+      <g className="pran-b">
+        <circle cx="60" cy="28" r="8" fill="none" stroke="#334155" strokeWidth="2.5" />
+        <line x1="60" y1="36" x2="60" y2="65" stroke="#334155" strokeWidth="2.5" strokeLinecap="round" />
+        <line x1="60" y1="45" x2="45" y2="55" stroke="#334155" strokeWidth="2.5" strokeLinecap="round" />
+        <line x1="45" y1="55" x2="52" y2="32" stroke="#334155" strokeWidth="2.5" strokeLinecap="round" />
+        <line x1="60" y1="45" x2="75" y2="55" stroke="#334155" strokeWidth="2.5" strokeLinecap="round" />
+        <line x1="60" y1="65" x2="45" y2="82" stroke="#334155" strokeWidth="2.5" strokeLinecap="round" />
+        <line x1="45" y1="82" x2="35" y2="82" stroke="#334155" strokeWidth="2.5" strokeLinecap="round" />
+        <line x1="60" y1="65" x2="75" y2="82" stroke="#334155" strokeWidth="2.5" strokeLinecap="round" />
+        <line x1="75" y1="82" x2="85" y2="82" stroke="#334155" strokeWidth="2.5" strokeLinecap="round" />
+      </g>
+      {playing && <text x="60" y="105" textAnchor="middle" fontSize="7" fill="#0ea5e9">Inhale... Exhale...</text>}
+    </svg>
+  );
+}
+
+// Mapping keywords to visual components
+const VIS_MAP = {
+  "push-up": PushupVis,
+  "pushup": PushupVis,
+  "wall push": WallPushupVis,
+  "squat": SquatVis,
+  "goblet squat": GobletSquatVis,
+  "plank pose": PlankVis,
+  "plank": PlankVis,
+  "side plank": SidePlankVis,
+  "lunge": LungeVis,
+  "row": RowVis,
+  "tube row": RowVis,
+  "curl": CurlVis,
+  "bicep": CurlVis,
+  "shoulder press": ShoulderPressVis,
+  "floor press": FloorPressVis,
+  "dead hang": DeadHangVis,
+  "glute bridge": GluteBridgeVis,
+  "mini loop": GluteBridgeVis,
+  "calf raise": CalfRaiseVis,
+  "calf raises": CalfRaiseVis,
+  "bicycle crunch": CrunchVis,
+  "lying leg raise": LegRaiseVis,
+  "leg raise": StandingLegRaiseVis,
+  "jumping jack": JumpingJacksVis,
+  "high knee": HighKneesVis,
+  "hiit": HIITVis,
+  "chair sit": ChairSitStandVis,
+  "sit-to-stand": ChairSitStandVis,
+  "walk": WalkVis,
+  "morning walk": WalkVis,
+  "arm raise": SeatedArmRaiseVis,
+  "seated arm": SeatedArmRaiseVis,
+  "tube pull": TubePullVis,
+  "face pull": FacePullVis,
+  "tricep": TricepPushdownVis,
+  "pushdown": TricepPushdownVis,
+  "surya": SuryaNamaskarVis,
+  "namaskar": SuryaNamaskarVis,
+  "downward dog": DownDogVis,
+  "boat pose": BoatPoseVis,
+  "navasana": BoatPoseVis,
+  "cobra": CobraVis,
+  "bhujangasana": CobraVis,
+  "forward fold": ForwardFoldVis,
+  "bridge pose": BridgePoseVis,
+  "bridge": BridgePoseVis,
+  "shavasana": ShavasanaVis,
+  "warrior": WarriorVis,
+  "chair pose": ChairPoseVis,
+  "tadasana": GenericVis,
+  "mountain": GenericVis,
+  "tree": TreePoseVis,
+  "vrikshasana": TreePoseVis,
+  "cat-cow": CatCowVis,
+  "cat cow": CatCowVis,
+  "legs up": LegsUpWallVis,
+  "triangle": TriangleVis,
+  "trikonasana": TriangleVis,
+  "child": ChildPoseVis,
+  "pranayama": PranayamaVis,
+  "anulom": PranayamaVis,
+};
+
+// ─── YouTube Tutorial Videos for Each Exercise ───
+// Curated short-form tutorials showing proper form
+const YT_MAP = {
+  "push-up": "IODxDxX7oi4",        // push up proper form
+  "pushup": "IODxDxX7oi4",
+  "wall push": "a6YHbXD2XlU",       // wall push ups
+  "squat": "aclHkVaku9U",           // bodyweight squat form
+  "goblet squat": "MeIiIdhvXT4",    // goblet squat tutorial
+  "plank": "ASdvN_XEl_c",           // plank proper form
+  "plank pose": "ASdvN_XEl_c",
+  "side plank": "K2VljzCC16g",      // side plank
+  "lunge": "QOVaHwm-Q6U",          // lunge form
+  "row": "pYcpY20QaE8",            // dumbbell row
+  "tube row": "xQNrFHEMhI4",       // resistance band row
+  "curl": "ykJmrZ5v0Oo",           // bicep curl form
+  "bicep": "ykJmrZ5v0Oo",
+  "shoulder press": "qEwKCR5JCog",  // DB shoulder press
+  "floor press": "uUGDRwge4F8",     // dumbbell floor press
+  "dead hang": "tBRGErADrWE",       // dead hang tutorial
+  "glute bridge": "OUgsJ8-Vi0E",    // glute bridge
+  "mini loop": "OUgsJ8-Vi0E",
+  "calf raise": "gwLzBJYoWlI",      // calf raises
+  "bicycle crunch": "9FGilxCbdz8",  // bicycle crunches
+  "lying leg raise": "l4kQd9eWclE",  // lying leg raises
+  "leg raise": "l4kQd9eWclE",
+  "jumping jack": "iSSAk4XCsRA",    // jumping jacks
+  "high knee": "tx5rgpDAJRI",       // high knees
+  "hiit": "iSSAk4XCsRA",
+  "chair sit": "MVSGEkR0fXE",       // sit to stand exercise
+  "sit-to-stand": "MVSGEkR0fXE",
+  "walk": "brFHyOtTwH4",            // proper walking form
+  "morning walk": "brFHyOtTwH4",
+  "arm raise": "YbX7Wd8jQ-Q",       // seated arm raises
+  "seated arm": "YbX7Wd8jQ-Q",
+  "tube pull": "xQNrFHEMhI4",       // band pulls
+  "face pull": "rep-qVOkqgk",       // face pulls with band
+  "tricep": "2-LAMcpzODU",          // tricep pushdown
+  "pushdown": "2-LAMcpzODU",
+  "surya": "aUSQkRawkSo",           // surya namaskar
+  "namaskar": "aUSQkRawkSo",
+  "downward dog": "EC7RGJ975Hk",     // downward dog
+  "boat pose": "QS6wfQXFEEo",       // boat pose
+  "navasana": "QS6wfQXFEEo",
+  "cobra": "fOdrW7nf9gE",           // cobra pose
+  "bhujangasana": "fOdrW7nf9gE",
+  "forward fold": "g7Uhp5tphAs",     // seated forward fold
+  "bridge pose": "OUgsJ8-Vi0E",     // bridge pose
+  "bridge": "OUgsJ8-Vi0E",
+  "shavasana": "1VYlOKUdylM",       // shavasana relaxation
+  "warrior": "Mn6RSIRCV3w",         // warrior I & II
+  "chair pose": "hbGOwUAr3iA",      // chair pose utkatasana
+  "tadasana": "2HTvZp5rPrg",        // mountain pose
+  "mountain": "2HTvZp5rPrg",
+  "tree": "Fr5kiIygm0c",            // tree pose
+  "vrikshasana": "Fr5kiIygm0c",
+  "cat-cow": "kqnua4rHVVA",         // cat cow stretch
+  "cat cow": "kqnua4rHVVA",
+  "legs up": "yDVCNhkbDAw",         // legs up the wall
+  "triangle": "S6gB0QHbWFE",        // triangle pose
+  "trikonasana": "S6gB0QHbWFE",
+  "child": "2MJGg-dUKh0",           // child's pose
+  "pranayama": "8VwufJrUhxk",       // anulom vilom
+  "anulom": "8VwufJrUhxk",
+};
+
+function getYouTubeId(name) {
+  const key = name.toLowerCase().replace(/[^a-z ]/g, "");
+  const match = Object.keys(YT_MAP).find(k => key.includes(k));
+  return match ? YT_MAP[match] : null;
+}
+
+// ─── Original App Data ───
 const FAMILY = {
   yash: {
     name: "Yash", age: 29, emoji: "💪", height: "5'10.5\"", weight: 80, bmi: 25.3,
@@ -358,6 +1401,7 @@ const dayL = () => ["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday",
 const sCol = (s) => ({critical:"#DC2626",high:"#EA580C",low:"#D97706",warning:"#CA8A04",ok:"#16A34A",managed:"#2563EB",taking:"#16A34A",start:"#EA580C",buy:"#7C3AED",insufficient:"#DC2626",switch:"#D97706"}[s]||"#6B7280");
 const sBg = (s) => ({critical:"#FEF2F2",high:"#FFF7ED",low:"#FFFBEB",warning:"#FEFCE8",ok:"#F0FDF4",managed:"#EFF6FF",taking:"#F0FDF4",start:"#FFF7ED",buy:"#F5F3FF",insufficient:"#FEF2F2",switch:"#FFFBEB"}[s]||"#F9FAFB");
 
+// ─── Persistent Storage (localStorage for Netlify) ───
 function load(p, t, fb) {
   try { const v = localStorage.getItem(`cf:${p}:${t}`); return v ? JSON.parse(v) : fb; } catch { return fb; }
 }
@@ -366,24 +1410,62 @@ function save(p, t, d) {
   try { localStorage.setItem(`cf:${p}:${t}`, JSON.stringify(d)); } catch {}
 }
 
+// Auto-detect week based on stored start date
+function getStartDate() {
+  try { return localStorage.getItem("cf:startDate") || null; } catch { return null; }
+}
+function setStartDateLS(date) {
+  try { localStorage.setItem("cf:startDate", date); } catch {}
+}
+
+function calcWeek(startDate) {
+  if (!startDate) return "week1-2";
+  const start = new Date(startDate);
+  const now = new Date();
+  const diffDays = Math.floor((now - start) / (1000 * 60 * 60 * 24));
+  const weekNum = Math.floor(diffDays / 7) + 1;
+  if (weekNum <= 2) return "week1-2";
+  if (weekNum === 3) return "week3";
+  return "week4";
+}
+
 export default function App() {
   const [scr, setScr] = useState("dash");
   const [per, setPer] = useState(null);
   const [ld, setLd] = useState(true);
   const [prog, setProg] = useState({ yash:{}, anil:{}, savita:{} });
+  const [currentWeek, setCurrentWeek] = useState("week1-2");
+  const [startDateVal, setStartDateVal] = useState(null);
 
   useEffect(() => {
     const pp=["yash","anil","savita"], tt=["exercises","hydration","supplements","habits","metrics"];
     const d={yash:{},anil:{},savita:{}};
     for(const p of pp) for(const t of tt) d[p][t]=load(p,t,{});
-    setProg(d); setLd(false);
+    // Load or set start date
+    let sd = getStartDate();
+    if (!sd) {
+      sd = new Date().toISOString().slice(0, 10);
+      setStartDateLS(sd);
+    }
+    setStartDateVal(sd);
+    setCurrentWeek(calcWeek(sd));
+    setProg(d);
+    setLd(false);
   }, []);
 
   const upd = useCallback((p,t,date,val) => {
     setProg(prev => {
       const n={...prev,[p]:{...prev[p],[t]:{...prev[p][t],[date]:val}}};
-      save(p,t,n[p][t]); return n;
+      save(p,t,n[p][t]);
+      return n;
     });
+  }, []);
+
+  const resetProgram = useCallback(() => {
+    const sd = new Date().toISOString().slice(0, 10);
+    setStartDateLS(sd);
+    setStartDateVal(sd);
+    setCurrentWeek("week1-2");
   }, []);
 
   const go = (s,p) => { if(p!==undefined) setPer(p); setScr(s); };
@@ -398,11 +1480,11 @@ export default function App() {
   );
 
   const views = {
-    dash: <Dash prog={prog} go={go}/>,
+    dash: <Dash prog={prog} go={go} startDate={startDateVal} currentWeek={currentWeek} resetProgram={resetProgram}/>,
     profile: <Prof p={per} prog={prog[per]} upd={upd} go={go}/>,
     schedule: <Sched p={per} go={go}/>,
     donts: <DontsView p={per} go={go}/>,
-    exercises: <Exer p={per} prog={prog[per]} upd={upd} go={go}/>,
+    exercises: <Exer p={per} prog={prog[per]} upd={upd} go={go} currentWeek={currentWeek} setCurrentWeek={setCurrentWeek}/>,
     hydration: <Hydra p={per} prog={prog[per]} upd={upd} go={go}/>,
     supplements: <Supps p={per} prog={prog[per]} upd={upd} go={go}/>,
     tracking: <Track p={per} prog={prog[per]} upd={upd} go={go}/>,
@@ -412,17 +1494,19 @@ export default function App() {
   return(
     <div style={$.app}>
       <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Fraunces:opsz,wght@9..144,700;9..144,800;9..144,900&display=swap" rel="stylesheet"/>
-      <style>{`*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}button:active{opacity:.85}@keyframes fi{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}.fi{animation:fi .25s ease}`}</style>
+      <style>{`*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}button:active{opacity:.85}@keyframes fi{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}.fi{animation:fi .25s ease}@keyframes expandVis{from{max-height:0;opacity:0}to{max-height:500px;opacity:1}}.vis-expand{animation:expandVis .4s ease forwards;overflow:hidden}`}</style>
       {views[scr]}
     </div>
   );
 }
 
-function Dash({prog, go}) {
+function Dash({prog, go, startDate, currentWeek, resetProgram}) {
   const td=todayKey();
   const st=(k)=>{const p=prog[k];const ex=p.exercises?.[td]?.completed?.length||0;const hy=p.hydration?.[td]?.bottles||0;
     const ht=FAMILY[k].hydrationTarget;const sd=p.supplements?.[td]?.taken?.length||0;const st=FAMILY[k].supplements.length;
     let dn=0;if(ex>0)dn++;if(hy>=ht)dn++;if(sd>=st)dn++;return{ex,hy,ht,sd,st,pct:Math.round(dn/3*100)};};
+  const wkLabel = currentWeek === "week1-2" ? "Week 1–2" : currentWeek === "week3" ? "Week 3" : "Week 4+";
+  const daysSince = startDate ? Math.floor((new Date() - new Date(startDate)) / 86400000) : 0;
 
   return(
     <div style={$.scr} className="fi">
@@ -430,6 +1514,14 @@ function Dash({prog, go}) {
         <div style={{fontSize:11,color:"#999",letterSpacing:1.5,textTransform:"uppercase"}}>{new Date().toLocaleDateString("en-IN",{weekday:"long",day:"numeric",month:"long",year:"numeric"})}</div>
         <h1 style={{fontFamily:"'Fraunces',serif",fontSize:28,fontWeight:900,color:"#1a1a2e",margin:"4px 0 0"}}>Chaudhary Family</h1>
         <p style={{fontSize:13,color:"#888",margin:"2px 0 0"}}>Health & Fitness Tracker</p>
+      </div>
+      <div style={{display:"flex",justifyContent:"center",gap:8,marginBottom:14}}>
+        <div style={{background:"#fff",borderRadius:10,padding:"6px 14px",fontSize:11,boxShadow:"0 1px 3px rgba(0,0,0,.06)"}}>
+          <span style={{color:"#999"}}>Program:</span> <span style={{fontWeight:700,color:"#D97706"}}>{wkLabel}</span>
+          <span style={{color:"#ccc",margin:"0 4px"}}>·</span>
+          <span style={{color:"#999"}}>Day {daysSince + 1}</span>
+        </div>
+        <button onClick={resetProgram} style={{background:"#fff",border:"1px solid #e5e5e5",borderRadius:10,padding:"6px 10px",fontSize:10,color:"#999",cursor:"pointer",fontFamily:"'Outfit',sans-serif"}} title="Reset program start date to today">↻ Reset</button>
       </div>
       {Object.entries(FAMILY).map(([k,m])=>{const s=st(k);return(
         <button key={k} onClick={()=>go("profile",k)} style={{...$.card,borderLeft:`4px solid ${m.color}`}}>
@@ -465,7 +1557,7 @@ function Prof({p, prog, upd, go}) {
   const menu=[
     {id:"schedule",icon:"🕐",l:"Daily Schedule",d:"When to do what — full day timeline"},
     {id:"donts",icon:"🚫",l:`DON'Ts & Safety Rules (${m.donts.length})`,d:"Critical rules — read these!"},
-    {id:"exercises",icon:"🏋️",l:"Today's Exercises",d:"Workout & yoga checklist"},
+    {id:"exercises",icon:"🏋️",l:"Today's Exercises",d:"Workout & yoga with animated demos"},
     {id:"hydration",icon:"💧",l:"Hydration Tracker",d:"Bottle-by-bottle tracking"},
     {id:"supplements",icon:"💊",l:"Supplements & Meds",d:"Daily supplement checklist"},
     {id:"tracking",icon:"📊",l:"Progress Tracking",d:"Weight, strength, habit streaks"},
@@ -594,12 +1686,29 @@ function DontsView({p, go}) {
   );
 }
 
-function Exer({p, prog, upd, go}) {
-  const td=todayKey(), dn=dayN(), m=FAMILY[p];
-  const [wk, setWk]=useState("week1-2");
-  const comp=prog.exercises?.[td]?.completed||[];
-  const tog=(i)=>{const n=comp.includes(i)?comp.filter(x=>x!==i):[...comp,i];upd(p,"exercises",td,{completed:n,wk});};
+function Exer({p, prog, upd, go, currentWeek, setCurrentWeek}) {
+  const td=todayKey(), m=FAMILY[p];
+  const [expanded, setExpanded]=useState(null);
+  const [previewDay, setPreviewDay] = useState(null); // null = today
+  const wk = currentWeek;
+  const setWk = setCurrentWeek;
 
+  // Determine which day to show exercises for
+  const activeDayCode = previewDay || dayN();
+  const activeDayLabel = previewDay
+    ? ["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"][["sun","mon","tue","wed","thu","fri","sat"].indexOf(previewDay)]
+    : dayL();
+  const isPreview = previewDay !== null;
+
+  const comp = isPreview ? [] : (prog.exercises?.[td]?.completed||[]);
+  const tog=(i)=>{
+    if (isPreview) return; // no toggling in preview mode
+    const n=comp.includes(i)?comp.filter(x=>x!==i):[...comp,i];
+    upd(p,"exercises",td,{completed:n,wk});
+  };
+
+  // Build exercise list for the active day
+  const dn = activeDayCode;
   let exs=[],exT="",wu=null,cd=null;
   if(p==="yash"){
     if(["mon","wed","fri"].includes(dn)){
@@ -622,40 +1731,156 @@ function Exer({p, prog, upd, go}) {
     }else{exT="Rest Day (walk only)";exs=[{n:"Morning Walk (30 min)",s:1,r:"30 min",e:"Outdoor"}];}
   }
 
+  // Progress bar
+  const totalEx = exs.length;
+  const doneCount = comp.length;
+  const pct = totalEx > 0 ? Math.round(doneCount / totalEx * 100) : 0;
+  const allDone = totalEx > 0 && doneCount >= totalEx;
+
+  // Mark all / unmark all
+  const markAll = () => {
+    if (isPreview) return;
+    if (allDone) {
+      upd(p, "exercises", td, { completed: [], wk });
+    } else {
+      upd(p, "exercises", td, { completed: Array.from({ length: totalEx }, (_, i) => i), wk });
+    }
+  };
+
   const hab=prog.habits?.[td]||{};
   const togH=(id)=>upd(p,"habits",td,{...hab,[id]:!hab[id]});
   const sp=p==="yash"?[{id:"family_walk",l:"Family post-dinner walk (10–15 min)"}]:
     p==="anil"?[{id:"pranayama",l:"🧘 Pranayama — Anulom Vilom (5 min)"},{id:"family_walk",l:"Family walk (10–15 min)"}]:
     [{id:"post_dinner_walk",l:"⭐ Post-dinner walk 10 min — NON-NEGOTIABLE"},{id:"calf_routine",l:"🦵 Calf cramp routine (3 min)"},{id:"family_walk",l:"Family walk (10–15 min)"}];
 
+  const DAY_BTNS = [
+    {k:"mon",l:"M"},{k:"tue",l:"T"},{k:"wed",l:"W"},{k:"thu",l:"Th"},{k:"fri",l:"F"},{k:"sat",l:"Sa"},{k:"sun",l:"Su"}
+  ];
+
   return(
     <div style={$.scr} className="fi">
       <button onClick={()=>go("profile")} style={$.back}>← {m.name}</button>
-      <h2 style={$.sec}>🏋️ Today's Exercises</h2>
-      <div style={{fontSize:13,color:m.color,fontWeight:600,marginBottom:2}}>{dayL()} — {exT}</div>
-      <div style={{fontSize:10,color:"#999",marginBottom:10}}>Rest 60–90 sec between sets</div>
-      <div style={{display:"flex",gap:5,marginBottom:12,flexWrap:"wrap"}}>
-        {["week1-2","week3","week4"].map(w=><button key={w} onClick={()=>setWk(w)} style={{...$.wkBtn,background:wk===w?m.color:"#f0f0f0",color:wk===w?"#fff":"#666"}}>{w==="week1-2"?"Wk 1–2":w==="week3"?"Wk 3":"Wk 4"}</button>)}
+      <h2 style={$.sec}>🏋️ {isPreview ? `${activeDayLabel} Preview` : "Today's Exercises"}</h2>
+      <div style={{fontSize:13,color:m.color,fontWeight:600,marginBottom:2}}>{activeDayLabel} — {exT}</div>
+      <div style={{fontSize:10,color:"#999",marginBottom:4}}>Rest 60–90 sec between sets</div>
+      <div style={{fontSize:10,color:"#64748b",marginBottom:8,fontStyle:"italic"}}>Tap any exercise to see animated form demo →</div>
+
+      {/* Day Preview Selector */}
+      <div style={{marginBottom:10}}>
+        <div style={{fontSize:9,color:"#888",textTransform:"uppercase",letterSpacing:1,marginBottom:4}}>Preview Day</div>
+        <div style={{display:"flex",gap:3}}>
+          <button onClick={()=>setPreviewDay(null)} style={{...$.dayBtn,background:!previewDay?m.color:"#f0f0f0",color:!previewDay?"#fff":"#666",fontWeight:!previewDay?700:500}}>Today</button>
+          {DAY_BTNS.map(d=>{
+            const isActive = previewDay===d.k;
+            const isToday = !previewDay && dayN()===d.k;
+            return <button key={d.k} onClick={()=>setPreviewDay(d.k===dayN()?null:d.k)} style={{...$.dayBtn,background:isActive?m.color:isToday?"#fff":"#f0f0f0",color:isActive?"#fff":"#666",border:isToday&&!isActive?`1.5px solid ${m.color}`:"1.5px solid transparent",fontWeight:isActive||isToday?700:500}}>{d.l}</button>;
+          })}
+        </div>
       </div>
+
+      {/* Week Selector */}
+      <div style={{display:"flex",gap:5,marginBottom:12,flexWrap:"wrap",alignItems:"center"}}>
+        {["week1-2","week3","week4"].map(w=><button key={w} onClick={()=>setWk(w)} style={{...$.wkBtn,background:wk===w?m.color:"#f0f0f0",color:wk===w?"#fff":"#666"}}>{w==="week1-2"?"Wk 1–2":w==="week3"?"Wk 3":"Wk 4"}</button>)}
+        <span style={{fontSize:9,color:"#aaa",marginLeft:4}}>auto-detected</span>
+      </div>
+
+      {/* Progress Bar */}
+      {!isPreview && totalEx > 0 && !exT.includes("Rest") && (
+        <div style={{marginBottom:12}}>
+          <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:4}}>
+            <span style={{fontSize:11,fontWeight:600,color:allDone?"#16A34A":"#555"}}>{allDone?"🎉 All done!": `${doneCount}/${totalEx} exercises`}</span>
+            <button onClick={markAll} style={{background:"none",border:`1.5px solid ${allDone?"#DC2626":m.color}`,borderRadius:8,padding:"3px 10px",fontSize:10,fontWeight:600,color:allDone?"#DC2626":m.color,cursor:"pointer",fontFamily:"'Outfit',sans-serif"}}>{allDone?"Unmark all":"✓ Mark all done"}</button>
+          </div>
+          <div style={{height:6,background:"#f0f0f0",borderRadius:3,overflow:"hidden"}}>
+            <div style={{height:"100%",width:`${pct}%`,background:allDone?"#16A34A":m.color,borderRadius:3,transition:"width .4s ease"}}/>
+          </div>
+        </div>
+      )}
+
+      {isPreview && <div style={{background:"#EFF6FF",borderRadius:10,padding:"7px 12px",fontSize:11,color:"#1e40af",marginBottom:10}}>👀 Preview mode — showing {activeDayLabel}'s workout. Tap "Today" to go back.</div>}
+
       {p==="anil"&&<div style={$.warn}>⚠️ <strong>BP:</strong> No heavy overhead · Breathe always · Water nearby · Sit if dizzy · Cilacar taken?</div>}
       {p==="savita"&&<div style={$.warn}>⚠️ No jumping · Slow & controlled · Chair for balance · Seated-only if knee pain</div>}
       {p==="yash"&&wu&&<div style={{...$.tip,marginBottom:10}}>🔥 <strong>Warm-up (5 min):</strong> {wu.join(" → ")}</div>}
 
       {exs.length===0&&exT.includes("Rest")?<div style={{padding:20,textAlign:"center",color:"#999"}}>Rest day! Stretch if you feel like it 🌿</div>:
-        exs.map((ex,i)=><button key={i} onClick={()=>tog(i)} style={{...$.exI,background:comp.includes(i)?"#F0FDF4":"#fff",borderColor:comp.includes(i)?"#86EFAC":"#eee"}}>
-          <div style={{...$.chk,background:comp.includes(i)?"#16A34A":"#fff",borderColor:comp.includes(i)?"#16A34A":"#ddd",color:"#fff"}}>{comp.includes(i)&&"✓"}</div>
-          <div style={{flex:1}}><div style={{fontWeight:600,fontSize:12,color:comp.includes(i)?"#16A34A":"#1a1a2e",textDecoration:comp.includes(i)?"line-through":"none"}}>{ex.n}</div>
-            <div style={{fontSize:10,color:"#999",marginTop:1}}>{ex.s&&ex.r?`${ex.s}×${ex.r}`:""}{ex.e?` · ${ex.e}`:""}</div></div>
-        </button>)}
+        exs.map((ex,i)=>(
+          <div key={i} style={{marginBottom:4}}>
+            <div style={{display:"flex",alignItems:"center",gap:0}}>
+              <button onClick={(e)=>{e.stopPropagation();tog(i);}} style={{...$.chk,background:comp.includes(i)?"#16A34A":"#fff",borderColor:comp.includes(i)?"#16A34A":"#ddd",color:"#fff",flexShrink:0,cursor:"pointer",margin:"0 10px 0 0",opacity:isPreview?0.4:1}}>{comp.includes(i)&&"✓"}</button>
+              <button onClick={()=>setExpanded(expanded===i?null:i)} style={{...$.exI,flex:1,margin:0,background:comp.includes(i)?"#F0FDF4":expanded===i?"#f8fafc":"#fff",borderColor:comp.includes(i)?"#86EFAC":expanded===i?m.color+"66":"#eee"}}>
+                <div style={{flex:1}}>
+                  <div style={{fontWeight:600,fontSize:12,color:comp.includes(i)?"#16A34A":"#1a1a2e",textDecoration:comp.includes(i)?"line-through":"none"}}>{ex.n}</div>
+                  <div style={{fontSize:10,color:"#999",marginTop:1}}>{ex.s&&ex.r?`${ex.s}×${ex.r}`:""}{ex.e?` · ${ex.e}`:""}</div>
+                </div>
+                <span style={{fontSize:10,color:m.color,fontWeight:600,opacity:0.7}}>{expanded===i?"▲":"▼"}</span>
+              </button>
+            </div>
+            {expanded===i&&(
+              <div className="vis-expand" style={{background:"#fff",border:`1.5px solid ${m.color}22`,borderRadius:"0 0 12px 12px",marginTop:-2,padding:"12px 8px",display:"flex",flexDirection:"column",alignItems:"center"}}>
+                <div style={{width:160,height:120}}>
+                  <ExVis name={ex.n} playing={true} />
+                </div>
+                <div style={{fontSize:10,color:"#64748b",marginTop:6,textAlign:"center",lineHeight:1.5}}>
+                  {ex.e && <span>💡 {ex.e}</span>}
+                  {ex.s&&ex.r&&<span style={{marginLeft:8}}>• {ex.s} sets × {ex.r}</span>}
+                </div>
+                {getYouTubeId(ex.n) && (
+                  <div style={{width:"100%",marginTop:10}}>
+                    <div style={{fontSize:10,fontWeight:600,color:m.color,marginBottom:4,textAlign:"center"}}>📺 Watch Tutorial</div>
+                    <div style={{position:"relative",paddingBottom:"56.25%",height:0,borderRadius:10,overflow:"hidden",background:"#000"}}>
+                      <iframe
+                        src={`https://www.youtube.com/embed/${getYouTubeId(ex.n)}?rel=0&modestbranding=1`}
+                        style={{position:"absolute",top:0,left:0,width:"100%",height:"100%",border:"none"}}
+                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                        allowFullScreen
+                        title={`${ex.n} tutorial`}
+                      />
+                    </div>
+                  </div>
+                )}
+              </div>
+            )}
+          </div>
+        ))}
 
       {p==="yash"&&cd&&!exT.includes("Rest")&&!exT.includes("Yoga")&&<div style={{...$.tip,marginTop:10}}>🧊 <strong>Cool-down (5 min):</strong> {cd.join(" → ")}</div>}
 
-      <div style={{marginTop:16}}><div style={$.lbl}>Daily Habits</div>
-        {sp.map(h=><button key={h.id} onClick={()=>togH(h.id)} style={{...$.exI,background:hab[h.id]?"#F0FDF4":"#fff",borderColor:hab[h.id]?"#86EFAC":"#eee"}}>
-          <div style={{...$.chk,background:hab[h.id]?"#16A34A":"#fff",borderColor:hab[h.id]?"#16A34A":"#ddd",color:"#fff"}}>{hab[h.id]&&"✓"}</div>
-          <div style={{fontSize:12,fontWeight:500,color:hab[h.id]?"#16A34A":"#333"}}>{h.l}</div>
-        </button>)}
-      </div>
+      {!isPreview && (
+        <div style={{marginTop:16}}><div style={$.lbl}>Daily Habits</div>
+          {sp.map(h=>{
+            const isP = h.id === "pranayama";
+            return (
+              <div key={h.id} style={{marginBottom:4}}>
+                <button onClick={()=>{if(isP){setExpanded(expanded==="pranayama"?null:"pranayama")}else{togH(h.id)}}} style={{...$.exI,background:hab[h.id]?"#F0FDF4":"#fff",borderColor:hab[h.id]?"#86EFAC":"#eee",marginBottom:0}}>
+                  <div onClick={(e)=>{if(isP){e.stopPropagation();togH(h.id);}}} style={{...$.chk,background:hab[h.id]?"#16A34A":"#fff",borderColor:hab[h.id]?"#16A34A":"#ddd",color:"#fff"}}>{hab[h.id]&&"✓"}</div>
+                  <div style={{fontSize:12,fontWeight:500,color:hab[h.id]?"#16A34A":"#333",flex:1}}>{h.l}</div>
+                  {isP && <span style={{fontSize:10,color:m.color,fontWeight:600,opacity:0.7,padding:"4px 8px"}}>{expanded==="pranayama"?"▲":"▼"}</span>}
+                </button>
+                {isP && expanded==="pranayama" && (
+                  <div className="vis-expand" style={{background:"#fff",border:`1.5px solid ${m.color}22`,borderRadius:"0 0 12px 12px",marginTop:-2,padding:"12px 8px",display:"flex",flexDirection:"column",alignItems:"center"}}>
+                    <div style={{width:140,height:110}}>
+                      <PranayamaVis playing={true} />
+                    </div>
+                    <div style={{width:"100%",marginTop:10}}>
+                      <div style={{fontSize:10,fontWeight:600,color:m.color,marginBottom:4,textAlign:"center"}}>📺 Watch Tutorial</div>
+                      <div style={{position:"relative",paddingBottom:"56.25%",height:0,borderRadius:10,overflow:"hidden",background:"#000"}}>
+                        <iframe
+                          src="https://www.youtube.com/embed/8VwufJrUhxk?rel=0&modestbranding=1"
+                          style={{position:"absolute",top:0,left:0,width:"100%",height:"100%",border:"none"}}
+                          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                          allowFullScreen
+                          title="Anulom Vilom tutorial"
+                        />
+                      </div>
+                    </div>
+                  </div>
+                )}
+              </div>
+            );
+          })}
+        </div>
+      )}
 
       {p==="savita"&&<div style={{...$.tip,marginTop:10}}><strong>Calf Routine:</strong> Ankle circles 10 each → Point/flex 15 → Calf stretch 20s each leg</div>}
       {p==="anil"&&<div style={{...$.tip,marginTop:10}}><strong>Anulom Vilom:</strong> Close right (thumb) → inhale left → Close left (ring) → exhale right → Inhale right → close → exhale left = 1 cycle. 5 min, slow & steady.</div>}
@@ -830,13 +2055,13 @@ const $={
   app:{fontFamily:"'Outfit',sans-serif",background:"linear-gradient(170deg,#FAFAF9 0%,#F5F0E8 50%,#EDE8DD 100%)",minHeight:"100vh",color:"#1a1a2e"},
   cen:{display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",minHeight:"100vh"},
   scr:{maxWidth:480,margin:"0 auto",padding:"14px 14px 36px"},
-  back:{background:"none",border:"none",fontSize:13,color:"#888",cursor:"pointer",padding:"8px 0",fontFamily:"'Outfit',sans-serif"},
+  back:{background:"#fff",border:"1.5px solid #e5e5e5",fontSize:15,fontWeight:600,color:"#555",cursor:"pointer",padding:"10px 18px",fontFamily:"'Outfit',sans-serif",borderRadius:12,marginBottom:4,boxShadow:"0 1px 2px rgba(0,0,0,.04)"},
   sec:{fontFamily:"'Fraunces',serif",fontSize:21,fontWeight:700,margin:"4px 0 8px",color:"#1a1a2e"},
   lbl:{fontSize:10,fontWeight:600,color:"#888",letterSpacing:1,textTransform:"uppercase",marginBottom:6},
   card:{width:"100%",background:"#fff",borderRadius:14,padding:"14px 16px",border:"none",cursor:"pointer",textAlign:"left",marginBottom:10,boxShadow:"0 1px 3px rgba(0,0,0,.06)"},
   menuBtn:{display:"flex",alignItems:"center",gap:10,width:"100%",padding:"11px 13px",background:"#fff",border:"1px solid #eee",borderRadius:12,cursor:"pointer",marginBottom:6,fontFamily:"'Outfit',sans-serif",textAlign:"left"},
   wkBtn:{border:"none",borderRadius:8,padding:"5px 13px",fontSize:11,fontWeight:600,cursor:"pointer",fontFamily:"'Outfit',sans-serif"},
-  exI:{display:"flex",alignItems:"center",gap:10,width:"100%",padding:"9px 11px",border:"1.5px solid #eee",borderRadius:10,cursor:"pointer",marginBottom:4,background:"#fff",fontFamily:"'Outfit',sans-serif",textAlign:"left"},
+  exI:{display:"flex",alignItems:"center",gap:10,width:"100%",padding:"9px 11px",border:"1.5px solid #eee",borderRadius:10,cursor:"pointer",marginBottom:0,background:"#fff",fontFamily:"'Outfit',sans-serif",textAlign:"left"},
   chk:{width:20,height:20,borderRadius:5,border:"2px solid #ddd",display:"flex",alignItems:"center",justifyContent:"center",fontSize:12,fontWeight:700,flexShrink:0},
   warn:{background:"#FEF2F2",borderRadius:10,padding:"9px 12px",fontSize:11,color:"#991B1B",marginBottom:10,lineHeight:1.5},
   tip:{background:"#FFFBEB",borderRadius:10,padding:"9px 12px",fontSize:11,color:"#92400E",lineHeight:1.6},
@@ -845,4 +2070,5 @@ const $={
   tCard:{background:"#fff",borderRadius:14,padding:14,marginBottom:10,boxShadow:"0 1px 3px rgba(0,0,0,.06)"},
   inp:{flex:1,padding:"6px 10px",border:"1.5px solid #ddd",borderRadius:8,fontSize:13,fontFamily:"'Outfit',sans-serif",outline:"none"},
   logB:{border:"none",color:"#fff",borderRadius:8,padding:"6px 14px",fontSize:12,fontWeight:600,cursor:"pointer",fontFamily:"'Outfit',sans-serif"},
+  dayBtn:{border:"1.5px solid transparent",borderRadius:8,padding:"5px 8px",fontSize:10,fontWeight:500,cursor:"pointer",fontFamily:"'Outfit',sans-serif",minWidth:28,textAlign:"center"},
 };
